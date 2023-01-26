@@ -20,6 +20,6 @@ do
     upper_name=${full_name[@]^}
     first_letter_of_name=${full_name[0]:0:1}
     last_name=${full_name[-1]}
-    new_email=${first_letter_of_name,}.${last_name,,}@abc.com
+    new_email=${first_letter_of_name,}.${last_name,,}${location_id}@abc.com
     echo $id,$location_id,$upper_name,$title,$new_email,$department >> $output_file 
 done <<<$body_of_file
