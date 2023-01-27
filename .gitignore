@@ -1,3 +1,5 @@
 *.pdf
 *new.csv
 *.json
+*.backup
+*updated.*

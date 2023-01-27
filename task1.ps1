@@ -1,43 +1,75 @@
-﻿# check number of parameters
-if ($args.Count -ne 3) {
-echo "ERROR! 3 parameters are mandatory: 
-ip_address_1 in format x.x.x.x,
-ip_address_2 in the format x.x.x.x
-network_mask in the format x.x.x.x or x"
-Exit
-}
+﻿# specify script's parameters
+Param(
+    [Parameter(Mandatory=$true)]
+    [IPAddress]$ip_address_1,
+    [Parameter(Mandatory=$true)]
+    [IPAddress]$ip_address_2,
+    [Parameter(Mandatory=$true)]
+    # input network_mask as string 
+    $network_mask
+)
 
-# address assignment
-$ip_address_1 = $args[0]
-$ip_address_2 = $args[1]
-$submask = $args[2]
-$valid_add = '^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$'
 
-# check valid addresses
-if ($ip_address_1 -notmatch $valid_add -or $ip_address_2 -notmatch $valid_add) {
-echo "ERROR! Invalid IP address!"
-Exit
-}
-elseif ($submask -notmatch $valid_add -and $submask -isnot [int]) {
-echo "ERROR! Invalid network_mask!"
-Exit
-}
-elseif ($submask -is [int] -and $submask -gt 32 -or $submask -lt 0) {
-echo "ERROR! Invalid network_mask!"
-Exit
-}
-
-# converting network submask
-if ($submask -as [int] -and $submask -ne 0) {
-$shift = 64 - $submask
-[System.Net.IPAddress]$submask = 0  
-$submask = [System.Net.IPAddress]::HostToNetworkOrder([int64]::MaxValue -shl $shift)
+function Print {
+	Param(
+	[Parameter(Mandatory = $true, ValueFromPipeline = $true)]
+	[boolean]$Same
+	)	      
+    Write-Host  $(If ($Same -eq $true) {"YES"} Else {"NO"}) -ForegroundColor yellow    
 }
 
 
-# assignment text info (subnet address) to vars
-$ip_subnet_1 = ([IPAddress] (([IPAddress] $ip_address_1).Address -band ([IPAddress] $submask).Address)).IPAddressToString
-$ip_subnet_2 = ([IPAddress] (([IPAddress] $ip_address_2).Address -band ([IPAddress] $submask).Address)).IPAddressToString
+# converting network mask
+function Convert-Mask {
+  param(
+    [Parameter(Mandatory=$true)]
+    [ValidateRange(0, 32)]
+    [Int]$MaskBits
+  )
+  $mask = ([Math]::Pow(2, $MaskBits) - 1) * [Math]::Pow(2, (32 - $MaskBits))
+  $bytes = [BitConverter]::GetBytes([UInt32]$mask)
+  (($bytes.Count - 1)..0 | ForEach-Object { [String]$bytes[$_] }) -join "."
+}
 
-# check if subnets equal
-if ($ip_subnet_1 -eq $ip_subnet_2) { echo "Yes" } else { echo "No" }
+
+function Same-Network {
+    Param(
+	    [Parameter(Mandatory)]
+	    $IP1,
+	    [Parameter(Mandatory)]
+	    $IP2,
+	    [Parameter(Mandatory)]
+	    [IPAddress]$Mask
+        )
+
+        # Write-Host $IP1
+        # Write-Host $IP2
+        # Write-Host $Mask
+
+        $subnet_1 = ([IPAddress]($IP1.Address -band $Mask.Address)).IPAddressToString
+        $subnet_2 = ([IPAddress]($IP2.Address -band $Mask.Address)).IPAddressToString
+
+        # Write-Host "SUBNET1=$($subnet_1)"
+        # Write-Host "SUBNET2=$($subnet_2)"		
+    
+        ($subnet_1 -eq $subnet_2)			     
+}
+
+# checking network mask
+try {
+    # check if network_mask is integer
+    $network_mask = if ($network_mask -is [int]){
+        Convert-Mask $network_mask
+        }
+        # check if network_mask can be vaild
+        elseif (([IPAddress]$network_mask -is [IPAddress]) -eq $true){
+        [IPAddress]$network_mask
+        }
+}
+# output all errors as "Invalid input!'
+catch {   
+    Write-Host "Invalid input!"
+    Exit
+}
+
+Same-Network $ip_address_1 $ip_address_2 $network_mask | Print
