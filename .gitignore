@@ -1,5 +1,15 @@
+.gitignore
+
 *.pdf
+
 *new.csv
 *.json
 *.backup
+
 *updated.*
+
+# python
+*.py
+venv/
+
+.idea/

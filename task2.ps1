@@ -13,7 +13,6 @@ $names_occurs_more_ones=@()
 foreach($item in $file){
     [System.Collections.ArrayList]$names_occurs_more_ones=$names_occurs_more_ones + $item.Name.ToLower()
     }
-
 # get another array with unique names   
 [System.Collections.ArrayList]$names_unique = $names_occurs_more_ones | sort -Unique
 
@@ -48,6 +47,7 @@ foreach($item in $file){
    }
 }
 
-# write to the new file without qoutes
+# write to the new file without qoutes and write file to the dirrectory where input file
 $new_file | ConvertTo-CSV -NoTypeInformation | 
-% { $_ -Replace '"', ""} | Out-File .\accounts_new.csv
+% { $_ -Replace '"', ""} | 
+Out-File ((Get-ChildItem -Path $specify_file) | %{$_.FullName}).Replace('.csv', '_new.csv')

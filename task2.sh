@@ -36,7 +36,7 @@ do
     IFS=" " read -a a_line <<< $line
 
     # getting name of a test and writing it to the file
-    if [[ $a_line[0]} == 'ok' ]]; then
+    if [[ ${a_line[0]} == 'ok' ]]; then
         name_start=2
         status='true'
     else
