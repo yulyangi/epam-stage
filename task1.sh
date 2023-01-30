@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # check valid input
-if [[ ! ${1+x} ]]; then
+if [[ $# -ne 1 ]]; then
     echo "Provide a file path as an argument to this script!"
     exit -1
 fi
@@ -19,7 +19,7 @@ echo $(head -n 1 $orig_file) > $new_file
 
 # this code create an array with duplicate names
 # this names have an email with location id
-# names in the form: "jdow" for more readability
+# names in the form: "jdoe" for more readability
 declare -a all_names
 while IFS="," read -r id location_id name title email department
 do

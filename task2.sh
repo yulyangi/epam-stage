@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # check if input provided
-if [[ ! ${1+x} ]]; then
+if [[ $# -ne 1 ]]; then
     echo "Provide a file path as an argument to this script!"
     exit -1
 fi
