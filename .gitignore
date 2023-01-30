@@ -1,5 +1,5 @@
-.gitignore
 
+*.zip
 *.pdf
 
 *new.csv
