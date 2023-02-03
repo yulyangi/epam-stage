@@ -9,7 +9,7 @@ fi
 # check if the file exists
 test -f $1 || { echo "file ${1} does not exist"; exit -1; }
 
-# creating a backup of file
+# create a backup of the file
 orig_file=$1
 cp $orig_file "${orig_file}.backup"
 new_file=$(echo $orig_file | sed "s/.csv/_new.csv/")
@@ -36,14 +36,23 @@ do
 done <<< $(tail -n +2 $orig_file)
 # echo ${dup_name[@]}
 
-
+# read the file with IFS
 while IFS="," read -r id location_id name title email department
 do
     full_name=( $name )
     upper_name=${full_name[@]^}
     first_letter_of_name=${full_name[0]:0:1}
     last_name=${full_name[-1]}
-   
+
+# this code reads title with double qoutes
+# if the title has double qoutes then the email - last part of the title
+    if [[ ${title::1} == \" ]]; then
+        title="${title}, ${email}"
+    else
+        title=${title}
+    fi
+
+# check if name in the 'dup_name' array
     if [[  ${dup_name[*]} =~  ${first_letter_of_name,,}${last_name,,} ]]; then
         new_email="${first_letter_of_name,,}${last_name,,}${location_id}@abc.com"
     else

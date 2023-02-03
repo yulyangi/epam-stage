@@ -1,4 +1,5 @@
-﻿# specify script's parameters
+﻿# script works in PS7
+# specify script's parameters
 Param(
     [Parameter(Mandatory=$true)]
     $specify_file
@@ -48,6 +49,12 @@ foreach($item in $file){
 }
 
 # write to the new file without qoutes and write file to the dirrectory where input file
-$new_file | ConvertTo-CSV -NoTypeInformation | 
-% { $_ -Replace '"', ""} | 
-Out-File ((Get-ChildItem -Path $specify_file) | %{$_.FullName}).Replace('.csv', '_new.csv')
+## this code works in PS5
+#$new_file | ConvertTo-CSV -NoTypeInformation | 
+#% { $_ -Replace '"', ""} | 
+#Out-File ((Get-ChildItem -Path $specify_file) | %{$_.FullName}).Replace('.csv', '_new.csv')
+
+# this code works only in PS7
+$new_path = ((Get-ChildItem -Path $specify_file) | %{$_.FullName}).Replace('.csv', '_new.csv')
+$new_file | Export-Csv -UseQuotes AsNeeded -Path $new_path -NoTypeInformation 
+
