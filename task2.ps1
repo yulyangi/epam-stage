@@ -1,4 +1,4 @@
-﻿# script works in PS7
+﻿# this script works in PS7
 # specify script's parameters
 Param(
     [Parameter(Mandatory=$true)]
@@ -10,10 +10,14 @@ $file = Import-Csv $specify_file
 $new_file=@()
 $names_occurs_more_ones=@()
 
-# get array with all names
+# get array with all names in format 'jdoe'
 foreach($item in $file){
-    [System.Collections.ArrayList]$names_occurs_more_ones=$names_occurs_more_ones + $item.Name.ToLower()
+    $temp=$item.Name.ToLower()
+    $fullname=$temp.split(" ")
+    $name= $fullname[0][0]+$fullname[1]
+    [System.Collections.ArrayList]$names_occurs_more_ones += $name
     }
+
 # get another array with unique names   
 [System.Collections.ArrayList]$names_unique = $names_occurs_more_ones | sort -Unique
 
@@ -28,14 +32,15 @@ foreach($item in $names_unique){
 foreach($item in $file){
     $temp=$item.Name.ToLower()
     $fullname=$temp.split(" ")
+    $name= $fullname[0][0]+$fullname[1]
 
-    # check if names occurs more then once and assign different emails
-    if ( $names_occurs_more_ones.Contains($item.Name.ToLower()) = $true ){
-        $email= $fullname[0][0]+$fullname[1]+$item.location_id+"@abc.com"
+    # check if name occurs more then once and assign different emails
+    if ( $names_occurs_more_ones.Contains($name) = $true ){
+        $email= $name+$item.location_id+"@abc.com"
     }
     else {
         # name occurs only once - email without location_id
-        $email= $fullname[0][0]+$fullname[1]+"@abc.com"
+        $email= $name+"@abc.com"
     }
 
     $new_file = $new_file + [PSCustomObject]@{
@@ -48,13 +53,6 @@ foreach($item in $file){
    }
 }
 
-# write to the new file without qoutes and write file to the dirrectory where input file
-## this code works in PS5
-#$new_file | ConvertTo-CSV -NoTypeInformation | 
-#% { $_ -Replace '"', ""} | 
-#Out-File ((Get-ChildItem -Path $specify_file) | %{$_.FullName}).Replace('.csv', '_new.csv')
-
 # this code works only in PS7
 $new_path = ((Get-ChildItem -Path $specify_file) | %{$_.FullName}).Replace('.csv', '_new.csv')
 $new_file | Export-Csv -UseQuotes AsNeeded -Path $new_path -NoTypeInformation 
-
