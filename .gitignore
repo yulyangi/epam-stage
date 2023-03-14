@@ -9,7 +9,6 @@
 *updated.*
 
 # python
-*.py
 venv/
 
 .idea/
