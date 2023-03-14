@@ -1,8 +1,9 @@
 #!/usr/bin/python3
 # this script convert 'output.txt' to the 'output.json'
-# you can execute this script in a shell like "sudo python3 output.py /path/to/the/output.txt/file"
-# you cat execute this script in a shell without arguments
-# in this case 'output.txt' must be in the same directory as the script
+# you can execute this script in a shell like "python3 output.py /path/to/the/output.txt/file"
+# you can execute this script in a shell like "./output.py /path/to/the/output.txt/file" as well
+# you can execute this script in a shell without any arguments
+# in this case 'output.txt' should be in the same directory as the script
 
 import json
 import sys
@@ -34,8 +35,8 @@ def read_the_file(file):
     new_list = list()
 
     # open the file, read the content, write the content to the 'new_dict' dictionaries
-    with open(file, 'r') as file:
-        content = file.read().splitlines()
+    with open(file, 'r') as f:
+        content = f.read().splitlines()
         for item in content:
             new_list.append(item.split(' '))
         new_dict['testName'] = ' '.join(new_list[0][1:3])
@@ -67,8 +68,8 @@ def read_the_file(file):
 
 # write 'new_dict' to the output.json
 def write_to_the_file(file, new_dict):
-    with open(file, 'w') as file:
-        json.dump(new_dict, file, indent=4)
+    with open(file, 'w') as f:
+        json.dump(new_dict, f, indent=4)
 
 
 if __name__ == '__main__':
